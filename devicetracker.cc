@@ -2015,6 +2015,8 @@ void device_tracker::set_device_tag(std::shared_ptr<kis_tracked_device_base> in_
 }
 
 void device_tracker::handle_new_datasource_event(std::shared_ptr<eventbus_event> evt) {
+    _MSG_DEBUG("Handling new datasource event");
+    
     auto ds_k = evt->get_event_content()->find(datasource_tracker::event_new_datasource());
 
     if (ds_k == evt->get_event_content()->end())
@@ -2025,6 +2027,8 @@ void device_tracker::handle_new_datasource_event(std::shared_ptr<eventbus_event>
     if (map_seenby_views) {
         auto source_uuid =datasource->get_source_uuid();
         auto source_key = datasource->get_source_key();
+
+        _MSG_DEBUG("New datasource event - UUID: {}, Key: {}", source_uuid, source_key);
 
         auto k = seenby_view_map.find(source_uuid);
 
@@ -2040,7 +2044,12 @@ void device_tracker::handle_new_datasource_event(std::shared_ptr<eventbus_event>
                             return dev->get_seenby_map()->find(source_key) != dev->get_seenby_map()->end();
                         });
             seenby_view_map[source_uuid] = seenby_view;
+            
+            _MSG_DEBUG("Created seenby view '{}' for datasource UUID: {}", seenby_view->get_view_id(), source_uuid);
+            
             add_view(seenby_view);
+        } else {
+            _MSG_DEBUG("Seenby view already exists for datasource UUID: {}", source_uuid);
         }
     }
 }
