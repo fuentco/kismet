@@ -355,9 +355,12 @@ void device_tracker_view::new_device(std::shared_ptr<kis_tracked_device_base> de
             if (dpmi == device_presence_map.end()) {
                 device_presence_map[device->get_key()] = true;
                 device_list->push_back(device);
+                _MSG_DEBUG("View {} added device {} - callback matched", view_id->get(), device->get_macaddr());
             }
 
             list_sz->set(device_list->size());
+        } else {
+            _MSG_DEBUG("View {} filtered device {} - callback rejected", view_id->get(), device->get_macaddr());
         }
     }
 }
@@ -380,6 +383,7 @@ void device_tracker_view::update_device(std::shared_ptr<kis_tracked_device_base>
         device_list->push_back(device);
         device_presence_map[device->get_key()] = true;
         list_sz->set(device_list->size());
+        _MSG_DEBUG("View {} added device {} via update - callback matched", view_id->get(), device->get_macaddr());
         return;
     }
 
@@ -394,6 +398,7 @@ void device_tracker_view::update_device(std::shared_ptr<kis_tracked_device_base>
         }
         device_presence_map.erase(dpmi);
         list_sz->set(device_list->size());
+        _MSG_DEBUG("View {} removed device {} via update - callback rejected", view_id->get(), device->get_macaddr());
         return;
     }
 }

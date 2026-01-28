@@ -2037,11 +2037,19 @@ void device_tracker::handle_new_datasource_event(std::shared_ptr<eventbus_event>
                 std::make_shared<device_tracker_view>(fmt::format("seenby-{}", source_uuid),
                         fmt::format("Devices seen by datasource {}", source_uuid),
                         std::vector<std::string>{"seenby-uuid", source_uuid.as_string()},
-                        [source_key](std::shared_ptr<kis_tracked_device_base> dev) -> bool {
-                            return dev->get_seenby_map()->find(source_key) != dev->get_seenby_map()->end();
+                        [source_key, source_uuid](std::shared_ptr<kis_tracked_device_base> dev) -> bool {
+                            bool found = dev->get_seenby_map()->find(source_key) != dev->get_seenby_map()->end();
+                            _MSG_DEBUG("Seenby-{} callback for device {}: {} (seenby_map size: {})", 
+                                source_uuid, dev->get_macaddr(), found ? "ACCEPT" : "REJECT",
+                                dev->get_seenby_map()->size());
+                            return found;
                         },
-                        [source_key](std::shared_ptr<kis_tracked_device_base> dev) -> bool {
-                            return dev->get_seenby_map()->find(source_key) != dev->get_seenby_map()->end();
+                        [source_key, source_uuid](std::shared_ptr<kis_tracked_device_base> dev) -> bool {
+                            bool found = dev->get_seenby_map()->find(source_key) != dev->get_seenby_map()->end();
+                            _MSG_DEBUG("Seenby-{} update_callback for device {}: {} (seenby_map size: {})", 
+                                source_uuid, dev->get_macaddr(), found ? "ACCEPT" : "REJECT",
+                                dev->get_seenby_map()->size());
+                            return found;
                         });
             seenby_view_map[source_uuid] = seenby_view;
             
